@@ -1,0 +1,16 @@
+# _quarto.yml
+project:
+  type: default
+
+bibliography: references.bib
+csl: ieee.csl
+
+format:
+  pdf:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    colorlinks: true
+    link-citations: true
+    geometry:
+      - margin=1in

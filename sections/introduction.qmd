@@ -1,0 +1,5 @@
+# Introduction
+
+Mojo builds on MLIR [@godoyMojoMLIRBasedPerformancePortable2025].
+@lattnerLLVMCompilationFramework2004 introduced LLVM as a lifelong
+program analysis framework.

@@ -1,2 +1,23 @@
-# Title
-test
+---
+title: "Mojo: An MLIR-Based Language for HPC"
+author: "Yannick"
+date: today
+abstract: |
+  Mojo is a new systems language built on MLIR...
+---
+
+
+{{< include sections/introduction.qmd >}}
+
+{{< include sections/background_mlir.qmd >}}
+
+{{< include sections/mlir_to_mojo.qmd >}}
+
+{{< include sections/mojo_hpc.qmd >}}
+
+{{< include sections/benchmarking.qmd >}}
+
+{{< include sections/discussion.qmd >}}
+
+::: {#refs}
+:::
