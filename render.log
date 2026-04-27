@@ -1,0 +1,40 @@
+[1mpandoc [22m
+  to: latex
+  output-file: paper.tex
+  standalone: true
+  pdf-engine: lualatex
+  variables:
+    graphics: true
+    tables: true
+  default-image-extension: pdf
+  
+[1mmetadata[22m
+  documentclass: scrartcl
+  classoption:
+    - DIV=11
+    - numbers=noendperiod
+  papersize: letter
+  header-includes:
+    - \KOMAoption{captions}{tableheading}
+  block-headings: true
+  engines:
+    - path: /Applications/quarto/share/extension-subtrees/julia-engine/_extensions/julia-engine/julia-engine.js
+  title: 'Mojo: An MLIR-Based Language for HPC'
+  author: Yannick
+  date: today
+  abstract: |
+    Mojo is a new systems language built on MLIR...
+  
+[1m[34m
+Rendering PDF[39m[22m
+[1m[34mrunning lualatex - 1[39m[22m
+  This is LuaHBTeX, Version 1.16.0 (TeX Live 2023) 
+   restricted system commands enabled.
+  
+[1m[34mrunning lualatex - 2[39m[22m
+  This is LuaHBTeX, Version 1.16.0 (TeX Live 2023) 
+   restricted system commands enabled.
+  
+
+Output created: paper.pdf
+
