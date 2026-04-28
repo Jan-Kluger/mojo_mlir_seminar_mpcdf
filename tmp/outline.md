@@ -4,6 +4,8 @@ Title (draft): Mojo on MLIR for HPC - solving lang split and vendor lock in (+ b
 abstract (TODO later)
 
 introduction
+- licensing issues with Mojo
+- focus of Mojo is on offloading and vectorization, but not multi-node operation
 - motivation
   - two lang split
   - vendor lock in
@@ -14,10 +16,20 @@ background
 - What is LLVM IR
 
 prior work (alternatives to mojo) (address lang split and vendor lock in)
-- julia vs mojo.
-  - adresses lang split issue - leaves vendor
-- kokkos v mojo.
-  - vice versa
+prior work (alternatives to mojo) (address lang split and vendor lock-in)
+- OpenCL
+  - original "write once, run anywhere" GPU standard
+  - fixes vendor lock-in, low-level C API, no lang split fix, largely superseded
+- SYCL
+  - modern C++ evolution of OpenCL
+  - fixes vendor lock-in, still C++ so no lang split fix, more ergonomic
+- Kokkos
+  - fixes vendor lock-in via performance portability abstraction
+  - still C++, no lang split fix
+- Julia
+  - fixes lang split (high-level + JIT to native perf)
+  - vendor lock-in remains
+
 
 mlir -> mojo (possible solution to addessed issues)
 - use cases of mlir.
@@ -56,6 +68,11 @@ discussion
 - portability benefits and drawbacks.
 
 future outlook
+- licensing
+  - Mojo is proprietary (Modular Inc.)
+  - source-available but not open source
+  - vendor dependency risk for HPC adoption
+  - contrast with open alternatives (SYCL, Kokkos, Julia all open source)
 - mojo is still pre 1.0
 - mojo as it matures.
   - hopefully open src 
