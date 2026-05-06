@@ -15,7 +15,6 @@ background
 - what is the vendor problem
 - What is LLVM IR
 
-prior work (alternatives to mojo) (address lang split and vendor lock in)
 prior work (alternatives to mojo) (address lang split and vendor lock-in)
 - OpenCL
   - original "write once, run anywhere" GPU standard

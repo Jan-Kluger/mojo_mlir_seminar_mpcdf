@@ -7,10 +7,10 @@ csl: ieee.csl
 
 format:
   pdf:
-    toc: true
-    toc-depth: 2
+    documentclass: IEEEtran
+    classoption:
+      - conference
+    toc: false
     number-sections: true
     colorlinks: true
     link-citations: true
-    geometry:
-      - margin=1in

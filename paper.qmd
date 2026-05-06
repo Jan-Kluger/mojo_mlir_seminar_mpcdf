@@ -1,6 +1,8 @@
 ---
 title: "Mojo: An MLIR-Based Language for HPC"
-author: "Yannick"
+author:
+  - name: Yannick Schürmann
+    affiliation: Technical University of Munich
 date: today
 abstract: |
   Mojo is a new systems language built on MLIR...
@@ -8,7 +10,9 @@ abstract: |
 
 {{< include sections/introduction.qmd >}}
 
-{{< include sections/background_mlir.qmd >}}
+{{< include sections/background.qmd >}}
+
+{{< include sections/prior_work.qmd >}}
 
 {{< include sections/mlir_to_mojo.qmd >}}
 
@@ -17,6 +21,10 @@ abstract: |
 {{< include sections/benchmarking.qmd >}}
 
 {{< include sections/discussion.qmd >}}
+
+{{< include sections/future_outlook.qmd >}}
+
+# References
 
 ::: {#refs}
 :::
