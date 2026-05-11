@@ -97,6 +97,26 @@ team reimplementing the same class of optimizations
 - enables reuse across domains, for example an OpenMP dialect shared between Fortran
   and C frontends [@lattnerMLIRCompilerInfrastructure2020]
 
+### Progressive Lowering
+
+- "the system should support progressive lowering, i.e. from the higher-level
+  representation down to the lowest-level, with the lowering being performed in small
+  steps along multiple abstraction levels" [@lattnerMLIRCompilerInfrastructure2020]
+- "the need for multiple levels of abstractions stems from the variety of platforms
+  and programming models that a generic compiler infrastructure has to support"
+  [@lattnerMLIRCompilerInfrastructure2020]
+- contrast with rigid pipelines: Clang lowers from ASTs to LLVM IR, to SelectionDAG,
+  to MachineInstr, and to MCInst in a fixed sequence. Compiler passes can only
+  operate at one level at a time [@lattnerMLIRCompilerInfrastructure2020]
+- crucially, MLIR allows *different parts of the IR to sit at different abstraction
+  levels simultaneously*: "mixing different levels of abstractions and different
+  concepts in the same IR is a key property of the system to allow a part of the
+  representation to remain in higher-level abstraction while another part is lowered"
+  [@lattnerMLIRCompilerInfrastructure2020]
+- this means a compiler for a custom accelerator can, for instance, reuse high-level
+  loop structure alongside primitive scalar/vector instructions specific to that
+  accelerator, in the same IR at the same time [@lattnerMLIRCompilerInfrastructure2020]
+
 ### SSA and Nested Regions
 
 - MLIR extends the standard SSA form with *nested regions* as a first-class concept:
@@ -127,25 +147,6 @@ affine.for %i = 0 to %N {
   The compiler can therefore analyse and transform loop structure without losing
   the surrounding context [@lattnerMLIRCompilerInfrastructure2020]
 
-### Progressive Lowering
-
-- "the system should support progressive lowering, i.e. from the higher-level
-  representation down to the lowest-level, with the lowering being performed in small
-  steps along multiple abstraction levels" [@lattnerMLIRCompilerInfrastructure2020]
-- "the need for multiple levels of abstractions stems from the variety of platforms
-  and programming models that a generic compiler infrastructure has to support"
-  [@lattnerMLIRCompilerInfrastructure2020]
-- contrast with rigid pipelines: Clang lowers from ASTs to LLVM IR, to SelectionDAG,
-  to MachineInstr, and to MCInst in a fixed sequence. Compiler passes can only
-  operate at one level at a time [@lattnerMLIRCompilerInfrastructure2020]
-- crucially, MLIR allows *different parts of the IR to sit at different abstraction
-  levels simultaneously*: "mixing different levels of abstractions and different
-  concepts in the same IR is a key property of the system to allow a part of the
-  representation to remain in higher-level abstraction while another part is lowered"
-  [@lattnerMLIRCompilerInfrastructure2020]
-- this means a compiler for a custom accelerator can, for instance, reuse high-level
-  loop structure alongside primitive scalar/vector instructions specific to that
-  accelerator, in the same IR at the same time [@lattnerMLIRCompilerInfrastructure2020]
 
 ### Why This Matters for Portability
 
