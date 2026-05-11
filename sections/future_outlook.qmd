@@ -1,2 +1,31 @@
-# Future outlook
+# Future Outlook
 
+## Licensing and Openness
+
+- Mojo is developed by Modular Inc. and is currently proprietary: source-available
+  but not open source
+- this creates a vendor dependency risk for HPC adoption, as institutions may be
+  reluctant to build workflows around a closed language
+- in contrast, the alternatives discussed in prior work (SYCL, Kokkos, Julia) are
+  all fully open source with active community governance
+- Godoy et al. note "the promise of becoming open-source by 2026"
+  [@godoyMojoMLIRBasedPerformancePortable2025], which could accelerate adoption
+  significantly if realised
+
+## Maturity
+
+- Mojo is still pre-1.0. The language specification, standard library, and GPU
+  backend are under active development and subject to breaking changes
+- features critical for HPC such as multi-node support, MPI interoperability, and
+  broader hardware targets beyond NVIDIA are not yet mature or are absent entirely
+
+## Looking Ahead
+
+- a maturing ecosystem including a package manager, debugger tooling, and broader
+  MLIR dialect support would reduce the friction that currently makes Mojo a
+  research interest rather than a production choice
+- the MLIR foundation gives Mojo a structural advantage: adding support for a new
+  hardware target reduces to writing a new lowering dialect, which is cheaper than
+  the library-level rewrites required by SYCL or Kokkos
+- the open question is whether the ecosystem and governance will catch up to the
+  technical promise

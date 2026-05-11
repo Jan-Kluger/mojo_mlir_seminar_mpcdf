@@ -1,3 +1,155 @@
-# Background: MLIR
+# Background
 
-MLIR's multi-level dialect architecture enables progressive lowering...
+To understand the design principles behind Mojo and the improvements it brings,
+it is first essential to understand the compiler infrastructure it is built on.
+Mojo is implemented directly on top of MLIR, which itself builds on the original
+LLVM IR. Understanding how IR works, where it falls short, and how MLIR
+addresses those shortcomings is what gives context to Mojo's key properties,
+which allow it to elegantly address both the two-language split and vendor
+lock-in.
+
+## LLVM [@lattnerLLVMCompilationFramework2004]
+
+LLVM is a compiler framework designed to normalize code representation across
+languages, making it possible to apply a shared set of optimizations to any
+code compiled with it [@lattnerLLVMCompilationFramework2004]. To achieve this,
+LLVM represents programs in Static Single Assignment (SSA) form, where each
+variable is defined exactly once. This representation, called LLVM Intermediate
+Representation (LLVM IR), abstracts away language-specific constructs and
+reduces code to raw semantics, allowing the same optimization passes to work
+across C, C++, Rust, Swift, and many other languages. IR is often
+described as roughly C with vectors [@lattnerMLIRCompilerInfrastructure2020],
+operating at a single fixed abstraction level. This means both high-level
+language features and machine-specific details are out of scope. To illustrate,
+consider the matrix multiplication below.
+
+```c
+for (int i = 0; i < N; i++)
+  for (int j = 0; j < N; j++)
+    for (int k = 0; k < N; k++)
+      C[i][j] += A[i][k] * B[k][j];
+```
+
+Compiled to IR, the loop structure disappears entirely into control flow.
+What remains is raw pointer arithmetic operating on individual memory addresses. Each `%` assignment is an
+instance of SSA.
+
+```llvm
+%a_p  = getelementptr float, float* %A, i64 %a_i
+%a_v  = load float, float* %a_p
+%b_p  = getelementptr float, float* %B, i64 %b_i
+%b_v  = load float, float* %b_p
+%prod = fmul float %a_v, %b_v
+%c_p  = getelementptr float, float* %C, i64 %c_i
+%c_v  = load float, float* %c_p
+%sum  = fadd float %c_v, %prod
+store float %sum, float* %c_p
+```
+
+the compiler can optimise individual operations but has lost the information that this is a matrix multiply, what the memory layout is, or that the loops are parallelisable
+
+As stated in the original LLVM paper, LLVM is not intended to be a universal
+compiler IR and does not represent high-level language features directly, nor
+does it capture machine-dependent features or code sequences used by back-end
+code generators [@lattnerLLVMCompilationFramework2004]. This works well for
+CPU-targeted, homogeneous compilation but becomes a limiting factor when
+targeting heterogeneous hardware or domain-specific optimizations. Many problems
+are simply better modeled at a different abstraction level, for example
+source-level analysis of C++ code is very difficult on IR
+[@lattnerMLIRCompilerInfrastructure2020]. As a result, languages like Swift,
+Rust, and Julia each ended up building their own mid-level IRs before targeting
+LLVM, leading to fragmented and duplicated compiler infrastructure with each
+team reimplementing the same class of optimizations
+[@lattnerMLIRCompilerInfrastructure2020], as illustrated in @fig-llvm.
+
+![Compilation pipeline of different languages with multiple mid-level IRs for language-specific optimization with common backend for multiple hardware targets [@lattnerMLIRCompilerInfrastructure2020]](images/LLVM_intermediate_IR.png){#fig-llvm width=90%}
+
+## MLIR [@lattnerMLIRCompilerInfrastructure2020]
+
+### Motivation
+
+- ML and HPC compiler stacks were deeply fragmented as a direct consequence of
+  LLVM's fixed abstraction level
+- frameworks like TensorFlow were "composed of many different compilers, graph
+  technologies, and runtime systems" with no shared infrastructure
+  [@lattnerMLIRCompilerInfrastructure2020]
+- this "manifested in multiple user-visible ways, including poor error messages,
+  failures in edge cases, unpredictable performance, and difficulty generalizing
+  the stack to support new hardware" [@lattnerMLIRCompilerInfrastructure2020]
+- MLIR was developed to solve this by making it cheap to define new abstraction
+  levels within a single, shared compiler infrastructure
+
+### Core Idea
+
+- multi-level IR: multiple abstraction levels coexist in one framework
+- "little builtin, everything customizable" [@lattnerMLIRCompilerInfrastructure2020]
+- the system is based on a minimal number of fundamental concepts, with most of the
+  intermediate representation left fully customizable
+- contrast with LLVM's one-size-fits-all approach: "a single abstraction level to
+  interface with the system" [@lattnerMLIRCompilerInfrastructure2020]
+
+### Dialects
+
+- logical groupings of operations, types, and attributes under a unique namespace
+- "MLIR explicitly supports a mix of dialects to enable progressive lowering. Ops from
+  different dialects can coexist at any level of the IR at any time" [@lattnerMLIRCompilerInfrastructure2020]
+- adding support for a new hardware target means defining a new lowering dialect
+- enables reuse across domains, for example an OpenMP dialect shared between Fortran
+  and C frontends [@lattnerMLIRCompilerInfrastructure2020]
+
+### SSA and Nested Regions
+
+- MLIR extends the standard SSA form with *nested regions* as a first-class concept:
+  operations contain regions, regions contain blocks, blocks contain operations.
+  This recursive structure lifts higher-level abstractions (loops, closures,
+  parallel constructs) directly into the IR at any abstraction level
+  [@lattnerMLIRCompilerInfrastructure2020]
+- instead of φ-nodes, MLIR uses block arguments passed by terminator operations,
+  which composes cleanly across nesting levels
+- the same matrix multiplication expressed in MLIR's affine dialect preserves the
+  loop structure as nested regions, each being a first-class scope with its own
+  SSA values and control flow:
+
+```mlir
+affine.for %i = 0 to %N {
+  affine.for %j = 0 to %N {
+    %0 = affine.load %A[%i]   : memref<?xf32>
+    %1 = affine.load %B[%j]   : memref<?xf32>
+    %2 = mulf %0, %1           : f32
+    %3 = affine.load %C[%i,%j] : memref<?x?xf32>
+    %4 = addf %3, %2           : f32
+    affine.store %4, %C[%i,%j] : memref<?x?xf32>
+  }
+}
+```
+
+- the loop body lives inside the operation as a region, not as a separate function.
+  The compiler can therefore analyse and transform loop structure without losing
+  the surrounding context [@lattnerMLIRCompilerInfrastructure2020]
+
+### Progressive Lowering
+
+- "the system should support progressive lowering, i.e. from the higher-level
+  representation down to the lowest-level, with the lowering being performed in small
+  steps along multiple abstraction levels" [@lattnerMLIRCompilerInfrastructure2020]
+- "the need for multiple levels of abstractions stems from the variety of platforms
+  and programming models that a generic compiler infrastructure has to support"
+  [@lattnerMLIRCompilerInfrastructure2020]
+- contrast with rigid pipelines: Clang lowers from ASTs to LLVM IR, to SelectionDAG,
+  to MachineInstr, and to MCInst in a fixed sequence. Compiler passes can only
+  operate at one level at a time [@lattnerMLIRCompilerInfrastructure2020]
+- crucially, MLIR allows *different parts of the IR to sit at different abstraction
+  levels simultaneously*: "mixing different levels of abstractions and different
+  concepts in the same IR is a key property of the system to allow a part of the
+  representation to remain in higher-level abstraction while another part is lowered"
+  [@lattnerMLIRCompilerInfrastructure2020]
+- this means a compiler for a custom accelerator can, for instance, reuse high-level
+  loop structure alongside primitive scalar/vector instructions specific to that
+  accelerator, in the same IR at the same time [@lattnerMLIRCompilerInfrastructure2020]
+
+### Why This Matters for Portability
+
+- the same high-level representation can be lowered to different hardware backends
+  by swapping the lowering dialect, keeping abstractions hardware-agnostic at the
+  top and hardware-specific at the bottom
+- Mojo is the first language built directly on MLIR, inheriting these properties

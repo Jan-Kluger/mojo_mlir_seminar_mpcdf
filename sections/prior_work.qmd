@@ -1,2 +1,32 @@
-# prior work (alternatives to mojo) (address lang split and vendor lock in)
+# Prior Work
 
+Several approaches have been developed to address vendor lock-in and the
+two-language problem in HPC. None of them fully solve both at once.
+
+## OpenCL [@stoneOpenCLParallelProgramming2010]
+
+- first open standard for GPU programming across vendors (NVIDIA, AMD, Intel)
+- addresses vendor lock-in but exposes a low-level C API with significant boilerplate
+- kernel code is still written in C, so the two-language problem is not addressed
+- largely superseded in practice by vendor-specific toolkits and higher-level successors
+
+## SYCL [@reyesSYCLSinglesourceAccelerator2016]
+
+- modern C++ successor to OpenCL with much better ergonomics
+- keeps the vendor portability of OpenCL
+- the language is still C++, so the gap between Python-based science workflows
+  and kernel code remains
+
+## Kokkos [@trottKokkos3Programming2022]
+
+- C++ library that abstracts over backends including CUDA, HIP, and OpenMP
+- solid vendor portability story with a mature ecosystem
+- requires C++, so the two-language split with Python is not addressed
+
+## Julia [@JuliaFreshApproach; @besardEffectiveExtensibleProgramming2019]
+
+- high-level JIT-compiled language that reaches near-native performance,
+  directly targeting the two-language problem
+- GPU support exists via packages like CUDA.jl and AMDGPU.jl, but these are
+  vendor-specific backends, so vendor lock-in is not resolved as cleanly as
+  in the C++ approaches above

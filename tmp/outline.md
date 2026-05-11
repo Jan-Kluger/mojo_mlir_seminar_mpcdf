@@ -11,9 +11,8 @@ introduction
   - vendor lock in
 
 background
-- what is the lang split
-- what is the vendor problem
 - What is LLVM IR
+- what is MLIR
 
 prior work (alternatives to mojo) (address lang split and vendor lock-in)
 - OpenCL

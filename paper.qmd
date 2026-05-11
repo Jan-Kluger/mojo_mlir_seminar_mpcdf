@@ -18,8 +18,6 @@ abstract: |
 
 {{< include sections/mojo_hpc.qmd >}}
 
-{{< include sections/benchmarking.qmd >}}
-
 {{< include sections/discussion.qmd >}}
 
 {{< include sections/future_outlook.qmd >}}

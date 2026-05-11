@@ -1,1 +1,67 @@
 # Discussion
+
+## The Language Split: Is Mojo as Productive as Claimed?
+
+- the "Python-like ease with C++ performance" pitch conflicts with what GPU
+  programming in Mojo actually looks like: explicit thread indexing, compile-time
+  sizes, manual memory layouts. "The learning curve and programming requirements
+  are still fairly low-level" [@godoyMojoMLIRBasedPerformancePortable2025]
+- Akre et al. note a "steep learning curve for developers accustomed to Python's
+  higher-level abstractions" once Rust- and C++-inspired safety features are
+  introduced [@akreComprehensiveReviewMojo2025]
+- Python interoperability is runtime-only and not compiled through MLIR, meaning
+  the high-productivity Python ecosystem and the high-performance Mojo world
+  remain separate in practice, reproducing the split Mojo set out to close
+- "Mojo strives for zero-cost abstraction so that higher level abstractions simply
+  compile down to fast, clean low-level programming languages without incurring
+  runtime bloat" [@akreComprehensiveReviewMojo2025], but this only holds for the
+  compile-time side of the language
+
+## Vendor Lock-in: Is Portability Worth the Performance Cost?
+
+- for memory-bound workloads the trade-off is favourable: one codebase delivers
+  around 87% of CUDA on NVIDIA and around 100% of HIP on AMD, "competitive with
+  CUDA and HIP for memory-bound kernels" [@godoyMojoMLIRBasedPerformancePortable2025]
+- for compute-bound workloads the case is weaker: Φ = 0.54 for miniBUDE means
+  single-source portability comes at a significant cost on both vendors
+- compared to Kokkos and SYCL, which also incur portability costs, Mojo is
+  less mature and lacks the high-level library ecosystem HPC codes depend on:
+  "support for this functionality (e.g., portable BLAS operations) is still
+  being defined" [@godoyMojoMLIRBasedPerformancePortable2025]
+- unlike SYCL and Kokkos, Mojo's portability is a compiler property rather than
+  a library abstraction: adding a new hardware target means adding a dialect, not
+  rewriting user code, an architectural advantage that may compound as the
+  ecosystem matures
+
+## Can It Get Better?
+
+- the performance gaps are implementation gaps, not architectural ones. `fast-math`
+  and immature atomic operations on AMD are known missing features, not
+  fundamental MLIR limitations: "we look forward to this capability being
+  available for these workloads in the near future"
+  [@godoyMojoMLIRBasedPerformancePortable2025]
+- "Mojo might present an opportunity to explore future compiler optimizations via
+  MLIR through AOT or JIT" as the language matures
+  [@godoyMojoMLIRBasedPerformancePortable2025]
+- "our expectation is that Mojo will continue to evolve under this programming
+  paradigm, with the promise of becoming open-source by 2026, as it moves toward
+  becoming a viable HPC + AI programming language"
+  [@godoyMojoMLIRBasedPerformancePortable2025]
+- the MPI story is a harder open question: Python interoperability is runtime-only
+  and orthogonal to Mojo's compile-time model, making multi-node HPC integration
+  structurally unclear [@godoyMojoMLIRBasedPerformancePortable2025]
+
+## Overall Assessment
+
+- Mojo is the only approach that structurally addresses both the language split
+  and vendor lock-in simultaneously. Julia solves the language split better today
+  in terms of ecosystem maturity, Kokkos and SYCL solve vendor lock-in better
+  today in terms of library coverage
+- "unlike other programming models that attempt to speed up Python or compile to
+  LLVM from the ground up (e.g., Julia, Rust), Mojo closes performance gaps by
+  offering a superset language that combines rich compile-time metaprogramming
+  via MLIR, performance-portable GPU programming, and run-time interoperability
+  with the Python ecosystem" [@godoyMojoMLIRBasedPerformancePortable2025]
+- "structurally sound" and "practically ready" are different things. Mojo's bet
+  is that building on MLIR will compound over time in ways library-based
+  alternatives cannot match, but this remains to be demonstrated at scale

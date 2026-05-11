@@ -1,1 +1,67 @@
 # Mojo: Built on MLIR
+
+## Mojo as an MLIR-native language
+
+- Mojo is the first programming language implemented as a set of MLIR dialects,
+  not a language that targets MLIR from outside [@lattnerMLIRCompilerInfrastructure2020]
+- Mojo inherits these properties directly as language features rather than leaving
+  them as compiler internals
+- this is possible because of MLIR's design principle of "little builtin, everything
+  customizable" [@lattnerMLIRCompilerInfrastructure2020]: the IR has no fixed set of
+  operations or types, so an entire language can be implemented as a set of dialects
+  rather than requiring a separate compiler
+
+## Progressive lowering as a language feature
+
+- performance in Mojo is controlled through type annotations on `def` functions
+- the more type information provided, the further the compiler can lower through
+  MLIR dialects toward hardware-specific operations
+- a `def` with no annotations behaves dynamically like Python, while the same `def`
+  with type annotations compiles to typed MLIR ops and then to native code
+- this makes MLIR's principle of "maintain structure of computation and progressively
+  lower to the hardware abstraction" [@lattnerMLIRCompilerInfrastructure2020]
+  user-facing: no rewrite into a separate language is required
+
+## Compile-time specialization via parameters
+
+- Mojo distinguishes compile-time values (parameters, written in square brackets `[]`)
+  from runtime values (arguments, written in parentheses `()`)
+- "In Mojo, 'parameter' always means a compile-time value, and 'argument' always
+  means a run-time value" [@MojoManualMojo]
+- "the compiler resolves the parameter values during compilation, and creates a
+  concrete version of the function for each unique parameter value" [@MojoManualMojo]
+- this exposes MLIR's constant folding and specialization directly, replacing C++
+  template metaprogramming with Python-like syntax
+
+## Value types and memory layout via `struct`
+
+- `struct` defines value types with explicit memory layout, mapping directly to
+  MLIR's type system
+- "because the compiler knows every field's type at compile time, it can calculate
+  the struct's exact memory footprint" [@MojoManualMojo]
+- "Python classes are dynamic: they allow for dynamic dispatch, monkey-patching,
+  and dynamically binding instance fields at runtime. Mojo structs are static:
+  they are bound at compile-time" [@MojoManualMojo]
+- this static layout is necessary for predictable GPU memory access patterns
+
+## Python interoperability
+
+- Mojo is designed to be a superset of Python: the goal is that any valid Python
+  program is also a valid Mojo program, with Mojo adding opt-in performance and
+  type safety on top [@MojoManualMojo]
+- "not only does Mojo use a Pythonic syntax, the plan is to provide full
+  compatibility with the Python ecosystem" [@MojoManualMojo]
+- existing Python libraries like numpy and scipy can be imported and used directly
+  without any FFI boilerplate [@MojoManualMojo]
+- because MLIR allows "mixing different levels of abstractions and different concepts
+  in the same IR" [@lattnerMLIRCompilerInfrastructure2020], hot paths can be lowered
+  to native code while the rest of the program remains in Python
+
+## Hardware portability via dialects
+
+- adding a new hardware target in Mojo reduces to adding a lowering dialect in MLIR,
+  for example NVVM for NVIDIA GPUs and AMDGPU for AMD GPUs
+- vendor portability is a compiler property rather than a library abstraction
+- the same Mojo source compiles to different backends without code changes, directly
+  realising MLIR's goal of "improving compilation for heterogeneous hardware"
+  [@lattnerMLIRCompilerInfrastructure2020]
