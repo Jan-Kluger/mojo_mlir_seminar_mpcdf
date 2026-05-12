@@ -6,6 +6,11 @@ author:
 date: today
 abstract: |
   Mojo is a new systems language built on MLIR...
+fig-pos: "H"
+header-includes:
+  - \usepackage{float}
+  - \usepackage{titlesec}
+  - \titlespacing*{\subsubsection}{0pt}{1.0em}{0.0em}
 ---
 
 {{< include sections/introduction.qmd >}}
