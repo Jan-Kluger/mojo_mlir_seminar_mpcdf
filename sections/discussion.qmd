@@ -22,7 +22,8 @@ rather than eliminated.
 For memory-bound workloads the trade-off is favourable. As the benchmark results show, a single Mojo codebase delivers competitive performance on both the H100 and MI300A, which is a reasonable cost for eliminating vendor-specific
 rewrites [@godoyMojoMLIRBasedPerformancePortable2025]. For compute-bound
 workloads the case is weaker, with miniBUDE reaching only 54% of vendor
-performance on average, driven largely by the absence of fast-math support.
+performance on average, driven largely by the absence of fast-math support
+[@godoyMojoMLIRBasedPerformancePortable2025].
 
 Compared to Kokkos and SYCL, Mojo is less mature and currently lacks the
 high-level library coverage those approaches offer. The architectural difference

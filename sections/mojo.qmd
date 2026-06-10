@@ -138,6 +138,11 @@ Matrix multiplication from @fig-matrixmul-c in Mojo's GPU programming model.
 
 ## Benchmarking
 
+We do not run our own benchmarks. Instead we survey and summarise the
+performance results reported by Godoy et al.
+[@godoyMojoMLIRBasedPerformancePortable2025], whose evaluation compares Mojo
+against vendor baselines on an NVIDIA H100 and an AMD MI300A.
+
 To evaluate Mojo's GPU performance, Godoy et al. port four widely-used HPC
 proxy kernels to Mojo and compare them against CUDA on an NVIDIA H100 and HIP
 on an AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025]. The four kernels
