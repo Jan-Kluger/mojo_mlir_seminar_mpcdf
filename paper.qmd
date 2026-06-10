@@ -1,16 +1,40 @@
 ---
-title: "Mojo: An MLIR-Based Language for HPC"
+title: "An MLIR-Based Approach to HPC Portability with Mojo"
 author:
   - name: Yannick Schürmann
     affiliation: Technical University of Munich
 date: today
 abstract: |
-  Mojo is a new systems language built on MLIR...
-fig-pos: "H"
+  High-performance computing faces two persistent challenges. The first is the
+  two-language problem, where researchers prototype in Python but must rewrite
+  performance-critical code in C++ or CUDA to meet performance demands. The
+  second is vendor lock-in, where GPU code written for NVIDIA hardware cannot
+  run on AMD or other architectures without significant porting effort. Prior
+  approaches have addressed each problem in isolation, through portability layers
+  such as Kokkos and SYCL, or through high-level languages such as Julia, but
+  none have resolved both simultaneously. Mojo is a new programming language
+  built directly on LLVM's Multi-Level Intermediate Representation (MLIR), which
+  allows it to address both problems at the compiler level rather than through
+  libraries or workarounds. This paper examines Mojo's design, analyzing how its
+  MLIR foundation enables Python interoperability and vendor-portable GPU
+  programming, and evaluates its HPC viability through benchmarks conducted by
+  researchers at Oak Ridge National Laboratory on NVIDIA H100 and AMD MI300A
+  GPUs. Results show that Mojo performs competitively with vendor baselines for
+  memory-bound workloads, while gaps remain for compute-bound kernels due to
+  missing fast-math compilation support. Although practical limitations remain,
+  Mojo represents a novel approach to both challenges at the compiler level that
+  may prove more capable than existing alternatives as the ecosystem matures.
 header-includes:
   - \usepackage{float}
+  - \usepackage{placeins}
+  - \usepackage{amssymb}
+  - \usepackage{caption}
   - \usepackage{titlesec}
   - \titlespacing*{\subsubsection}{0pt}{1.0em}{0.0em}
+  - \usepackage{etoolbox}
+  - \BeforeBeginEnvironment{Shaded}{\vspace{-4pt}}
+  - \AfterEndEnvironment{Shaded}{\vspace{-4pt}}
+  - \raggedbottom
 ---
 
 {{< include sections/introduction.qmd >}}
@@ -19,9 +43,7 @@ header-includes:
 
 {{< include sections/prior_work.qmd >}}
 
-{{< include sections/mlir_to_mojo.qmd >}}
-
-{{< include sections/mojo_hpc.qmd >}}
+{{< include sections/mojo.qmd >}}
 
 {{< include sections/discussion.qmd >}}
 
@@ -31,3 +53,5 @@ header-includes:
 
 ::: {#refs}
 :::
+
+{{< include sections/appendix.qmd >}}

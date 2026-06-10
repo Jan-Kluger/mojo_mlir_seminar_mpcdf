@@ -1,67 +1,57 @@
 # Discussion
 
-## The Language Split: Is Mojo as Productive as Claimed?
+## The Language Split and Developer Productivity
 
-- the "Python-like ease with C++ performance" pitch conflicts with what GPU
-  programming in Mojo actually looks like: explicit thread indexing, compile-time
-  sizes, manual memory layouts. "The learning curve and programming requirements
-  are still fairly low-level" [@godoyMojoMLIRBasedPerformancePortable2025]
-- Akre et al. note a "steep learning curve for developers accustomed to Python's
-  higher-level abstractions" once Rust- and C++-inspired safety features are
-  introduced [@akreComprehensiveReviewMojo2025]
-- Python interoperability is runtime-only and not compiled through MLIR, meaning
-  the high-productivity Python ecosystem and the high-performance Mojo world
-  remain separate in practice, reproducing the split Mojo set out to close
-- "Mojo strives for zero-cost abstraction so that higher level abstractions simply
-  compile down to fast, clean low-level programming languages without incurring
-  runtime bloat" [@akreComprehensiveReviewMojo2025], but this only holds for the
-  compile-time side of the language
+Mojo is often pitched as combining Python-like ease with C++ performance, but
+the reality of GPU programming in Mojo sits closer to the C++ end of that
+spectrum. Writing a kernel requires explicit thread indexing, compile-time
+problem sizes, and manual memory layouts, and Godoy et al. note that the
+learning curve and programming requirements remain fairly low-level
+[@godoyMojoMLIRBasedPerformancePortable2025]. Developers coming from Python who
+encounter Mojo's ownership model and compile-time constraints face a steeper
+transition than the language's surface syntax suggests
+[@akreComprehensiveReviewMojo2025].
 
-## Vendor Lock-in: Is Portability Worth the Performance Cost?
+More fundamentally, because Python interoperability is runtime-only, a developer
+working in Mojo still maintains a boundary between the Python world and the
+compiled Mojo world. The split is narrowed but reproduced in a different form,
+rather than eliminated.
 
-- for memory-bound workloads the trade-off is favourable: one codebase delivers
-  around 87% of CUDA on NVIDIA and around 100% of HIP on AMD, "competitive with
-  CUDA and HIP for memory-bound kernels" [@godoyMojoMLIRBasedPerformancePortable2025]
-- for compute-bound workloads the case is weaker: Φ = 0.54 for miniBUDE means
-  single-source portability comes at a significant cost on both vendors
-- compared to Kokkos and SYCL, which also incur portability costs, Mojo is
-  less mature and lacks the high-level library ecosystem HPC codes depend on:
-  "support for this functionality (e.g., portable BLAS operations) is still
-  being defined" [@godoyMojoMLIRBasedPerformancePortable2025]
-- unlike SYCL and Kokkos, Mojo's portability is a compiler property rather than
-  a library abstraction: adding a new hardware target means adding a dialect, not
-  rewriting user code, an architectural advantage that may compound as the
-  ecosystem matures
+## Vendor Portability and Performance Cost
 
-## Can It Get Better?
+For memory-bound workloads the trade-off is favourable. As the benchmark results show, a single Mojo codebase delivers competitive performance on both the H100 and MI300A, which is a reasonable cost for eliminating vendor-specific
+rewrites [@godoyMojoMLIRBasedPerformancePortable2025]. For compute-bound
+workloads the case is weaker, with miniBUDE reaching only 54% of vendor
+performance on average, driven largely by the absence of fast-math support.
 
-- the performance gaps are implementation gaps, not architectural ones. `fast-math`
-  and immature atomic operations on AMD are known missing features, not
-  fundamental MLIR limitations: "we look forward to this capability being
-  available for these workloads in the near future"
-  [@godoyMojoMLIRBasedPerformancePortable2025]
-- "Mojo might present an opportunity to explore future compiler optimizations via
-  MLIR through AOT or JIT" as the language matures
-  [@godoyMojoMLIRBasedPerformancePortable2025]
-- "our expectation is that Mojo will continue to evolve under this programming
-  paradigm, with the promise of becoming open-source by 2026, as it moves toward
-  becoming a viable HPC + AI programming language"
-  [@godoyMojoMLIRBasedPerformancePortable2025]
-- the MPI story is a harder open question: Python interoperability is runtime-only
-  and orthogonal to Mojo's compile-time model, making multi-node HPC integration
-  structurally unclear [@godoyMojoMLIRBasedPerformancePortable2025]
+Compared to Kokkos and SYCL, Mojo is less mature and currently lacks the
+high-level library coverage those approaches offer. The architectural difference
+is significant however. Mojo's portability is a compiler property rather than a
+library abstraction, meaning support for a new hardware target requires adding a
+lowering dialect rather than rewriting user code. This is an advantage that may
+compound as the ecosystem matures, in a way that library-based portability
+cannot.
+
 
 ## Overall Assessment
 
-- Mojo is the only approach that structurally addresses both the language split
-  and vendor lock-in simultaneously. Julia solves the language split better today
-  in terms of ecosystem maturity, Kokkos and SYCL solve vendor lock-in better
-  today in terms of library coverage
-- "unlike other programming models that attempt to speed up Python or compile to
-  LLVM from the ground up (e.g., Julia, Rust), Mojo closes performance gaps by
-  offering a superset language that combines rich compile-time metaprogramming
-  via MLIR, performance-portable GPU programming, and run-time interoperability
-  with the Python ecosystem" [@godoyMojoMLIRBasedPerformancePortable2025]
-- "structurally sound" and "practically ready" are different things. Mojo's bet
-  is that building on MLIR will compound over time in ways library-based
-  alternatives cannot match, but this remains to be demonstrated at scale
+Today, Julia handles the two-language split more effectively than Mojo, with a
+mature ecosystem and JIT compilation that reaches near-native performance without
+requiring a clean break between high-level and performance-critical code. Kokkos
+and SYCL handle vendor portability more effectively, with battle-tested library
+support and the BLAS integration that serious HPC workloads depend on. Mojo
+currently lags behind both on their respective strengths, with a steep low-level
+programming model, gaps in library coverage and compute-bound performance, and
+the practical limitations discussed above, including single-node execution,
+missing fast-math support, and incomplete tooling.
+
+What Mojo offers that neither Julia nor Kokkos can is a single architectural
+foundation that structurally targets both problems at once. By being built
+directly on MLIR, hardware portability and progressive compilation are
+properties of the language itself rather than libraries added on top. If these
+gaps are addressed, the architecture is already in place to match or exceed what
+either approach offers individually. That combination has not existed before, and
+it remains Mojo's fundamental case for why it is worth watching. Having the
+right architecture and being production-ready are different things however, and
+whether Mojo's MLIR foundation will prove a lasting advantage over library-based
+approaches remains to be demonstrated at scale.

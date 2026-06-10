@@ -1,31 +1,31 @@
 # Future Outlook
 
-## Licensing and Openness
+Several of the gaps identified in this paper are addressable in the near term.
+The performance gaps are implementation gaps rather than architectural ones. Fast-math support and the inconsistent atomic operation
+behavior on AMD are known missing features within MLIR's existing capabilities,
+not fundamental limitations of the approach
+[@godoyMojoMLIRBasedPerformancePortable2025]. As Mojo matures, MLIR's AOT and
+JIT paths offer opportunities to close these gaps in ways library-based
+approaches cannot easily replicate. Broader adoption also depends on factors
+beyond performance. Mojo is currently source-available but not open source, and
+institutions building long-term HPC workflows are generally reluctant to commit
+to a closed language. Modular has indicated that Mojo will become open-source by
+2026 [@godoyMojoMLIRBasedPerformancePortable2025], which could significantly
+lower the barrier to adoption in academic and national lab settings. The language
+is also still in active development, and the specification, standard library, and
+GPU backend remain subject to breaking changes. Features critical for large-scale
+HPC such as multi-node support and portable high-level libraries are either
+absent or not yet mature.
 
-- Mojo is developed by Modular Inc. and is currently proprietary: source-available
-  but not open source
-- this creates a vendor dependency risk for HPC adoption, as institutions may be
-  reluctant to build workflows around a closed language
-- in contrast, the alternatives discussed in prior work (SYCL, Kokkos, Julia) are
-  all fully open source with active community governance
-- Godoy et al. note "the promise of becoming open-source by 2026"
-  [@godoyMojoMLIRBasedPerformancePortable2025], which could accelerate adoption
-  significantly if realised
-
-## Maturity
-
-- Mojo is still pre-1.0. The language specification, standard library, and GPU
-  backend are under active development and subject to breaking changes
-- features critical for HPC such as multi-node support, MPI interoperability, and
-  broader hardware targets beyond NVIDIA are not yet mature or are absent entirely
-
-## Looking Ahead
-
-- a maturing ecosystem including a package manager, debugger tooling, and broader
-  MLIR dialect support would reduce the friction that currently makes Mojo a
-  research interest rather than a production choice
-- the MLIR foundation gives Mojo a structural advantage: adding support for a new
-  hardware target reduces to writing a new lowering dialect, which is cheaper than
-  the library-level rewrites required by SYCL or Kokkos
-- the open question is whether the ecosystem and governance will catch up to the
-  technical promise
+The MLIR foundation gives Mojo an architectural advantage that alternatives do not have.
+Adding support for a new hardware target reduces to writing a lowering dialect,
+which is cheaper than the library-level rewrites required by SYCL or Kokkos.
+Whether the ecosystem and governance can catch up to the technical promise is the
+open question. If they do, Mojo would be the first language to resolve both the
+two-language problem and vendor lock-in at the compiler level. There are already
+early signals of institutional interest. Researchers at Oak Ridge National
+Laboratory, home of the world's first exascale machine, have actively benchmarked
+Mojo on state-of-the-art hardware, with results already showing competitive
+performance for memory-bound workloads [@godoyMojoMLIRBasedPerformancePortable2025].
+The underlying infrastructure, MLIR, is battle-tested in production systems
+across the ML industry, giving Mojo a proven foundation to build on.
