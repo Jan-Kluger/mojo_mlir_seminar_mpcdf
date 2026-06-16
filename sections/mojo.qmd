@@ -1,7 +1,8 @@
 # Mojo
 
-Mojo is the first language implemented directly as a set of MLIR dialects
-rather than targeting MLIR from outside [@lattnerMLIRCompilerInfrastructure2020].
+Mojo is the first language fully built on MLIR, implemented as a set of MLIR
+dialects rather than targeting MLIR from outside
+[@godoyMojoMLIRBasedPerformancePortable2025].
 Where the approaches in the previous section each addressed one problem in
 isolation, Mojo's MLIR foundation enables both solutions in a single language.
 Python interoperability closes the language split, and MLIR's hardware dialects
@@ -11,7 +12,7 @@ pipelines.
 ## Resolving the Two-Language Problem
 
 Mojo is designed as a superset of Python, with the goal that any valid Python
-program is also a valid Mojo program [@MojoManualMojo]. Existing Python
+program is also a valid Mojo program. Existing Python
 libraries such as numpy and scipy can be imported and used directly without FFI
 boilerplate [@MojoManualMojo], so a developer can start from a working Python codebase and add
 performance incrementally.
@@ -71,7 +72,7 @@ annotations from the programmer.
 ### Compile-Time Specialization
 
 Mojo separates compile-time values, called parameters, from runtime values,
-called arguments [@MojoManualMojo]. The compiler resolves parameters at compile
+called arguments. The compiler resolves parameters at compile
 time and generates a specialized version of the function for each unique set of
 parameter values [@MojoManualMojo]. This gives MLIR full visibility into problem
 shape at compile-time, enabling loop unrolling, register specialization, and
@@ -178,8 +179,7 @@ instead. $\Phi$ is still computed for all four kernels.
 ### Memory-Bound Kernels
 
 The seven-point stencil applies the Laplacian operator over a three-dimensional
-grid, a pattern common in PDE solvers for modeling diffusion phenomena
-[@godoyMojoMLIRBasedPerformancePortable2025]. It is
+grid, a pattern common in PDE solvers for modeling diffusion phenomena. It is
 memory-bound because each output value requires reading seven neighbouring cells
 from global memory. Mojo reaches 82--87% of CUDA performance on the H100, with
 profiling showing that Mojo kernels use more registers per thread (24) than the
@@ -206,8 +206,7 @@ across all operations, with $\Phi$ = 0.96 (@fig-babelstream).
 ### Compute-Bound Kernels
 
 miniBUDE simulates molecular docking, the computational process of predicting
-how a small molecule binds to a protein target
-[@godoyMojoMLIRBasedPerformancePortable2025]. It is compute-bound due to the
+how a small molecule binds to a protein target. It is compute-bound due to the
 dense floating-point arithmetic involved. Mojo's performance is significantly
 affected by the absence of fast-math compilation support, which allows compilers
 to relax floating-point precision rules in exchange for speed. On the H100, Mojo
@@ -215,16 +214,33 @@ sits between the non-fast-math and fast-math CUDA versions. On the MI300A, Mojo
 reaches only around 38% of HIP performance, giving $\Phi$ = 0.54
 [@godoyMojoMLIRBasedPerformancePortable2025] (@fig-minibude).
 
+miniBUDE illustrates how $\Phi$ comes together, since it is the case where Mojo
+stays competitive with CUDA but falls well behind HIP. Each platform is measured
+at two configurations, and the per-run efficiencies are 0.82 and 0.59 against
+CUDA on the H100 and 0.38 and 0.38 against HIP on the MI300A (@fig-overall-perf).
+Averaging these four values gives
+
+$$\Phi = \frac{0.82 + 0.59 + 0.38 + 0.38}{4} = 0.54$$
+
+which shows how a single $\Phi$ collapses strong NVIDIA results and weak AMD
+results into one number that reflects neither platform on its own.
+
 ![Mojo vs CUDA and HIP performance for miniBUDE on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/miniBUDE_perf.png){#fig-minibude width=75% fig-pos="ht"}
 
 
 Hartree-Fock approximates the electronic structure of molecules by computing
-electron-repulsion integrals, a calculation that scales as O(N⁴) with the
-number of atoms [@godoyMojoMLIRBasedPerformancePortable2025]. Parallelism is
+electron-repulsion integrals, a calculation that scales as $O(N^4)$ with the
+number of atoms. Parallelism is
 heavily limited by atomic operations, where multiple threads must update the
 same memory locations simultaneously. The results show significant inconsistency,
 with Mojo being 2.5x faster than CUDA at 256 atoms but 55x slower at 1024
-atoms. On the MI300A, Mojo underperforms HIP across all cases. The reported
+atoms. On the MI300A, Mojo underperforms HIP in every case that completed, and
+the largest case (a=1024) produced no result at all. The authors do not define
+precisely what the missing value represents, presumably a timeout, noting only
+that they "observe abnormal behaviors in terms of performance for the 512 and
+1024 cases" and that "Mojo largely underperforms the HIP implementation in all
+cases, which leads us to believe that we are still hitting a corner case in the
+language". The reported
 $\Phi$ = 0.92 is misleading, as it averages out Mojo outperforming CUDA with
 Mojo underperforming HIP, obscuring the real picture
 [@godoyMojoMLIRBasedPerformancePortable2025] (@fig-hartree).
@@ -252,15 +268,18 @@ shortfalls [@godoyMojoMLIRBasedPerformancePortable2025].
 
 ## Current Scope and Limitations
 
+Mojo is still pre-1.0 software: the latest tagged release at the time of writing
+is v1.0.0b1, a beta whose language and APIs may still change before the eventual
+1.0 release [@MojoReleasesMojo]. The examples in this paper target that version,
+and the limitations below should be read as a snapshot of a language still under
+active development rather than as permanent constraints.
+
 Mojo currently targets single-node execution only, which limits its
-applicability to large-scale distributed HPC workloads
-[@godoyMojoMLIRBasedPerformancePortable2025]. Several compiler features common
+applicability to large-scale distributed HPC workloads. Several compiler features common
 in HPC also remain unavailable, most notably fast-math compilation, which
 relaxes floating-point precision rules to allow faster arithmetic and makes a
-significant performance difference in compute-bound workloads
-[@godoyMojoMLIRBasedPerformancePortable2025]. More broadly, many HPC applications depend on highly optimised libraries such
-as BLAS, and portable Mojo equivalents are still being developed
-[@godoyMojoMLIRBasedPerformancePortable2025]. Tooling support is similarly
+significant performance difference in compute-bound workloads. More broadly, many HPC applications depend on highly optimised libraries such
+as BLAS, and portable Mojo equivalents are still being developed. Tooling support is similarly
 incomplete, with debugging limited to NVIDIA's Nsight toolchain and no
 officially supported profiling tool for AMD GPUs available at the time of the
 study [@godoyMojoMLIRBasedPerformancePortable2025].

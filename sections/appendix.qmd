@@ -1,6 +1,6 @@
 # Appendix
 
-The complete Mojo 1.0.0b1 matrix multiplication implementation used throughout this
+The complete Mojo 1.0.0b1 [@MojoReleasesMojo] matrix multiplication implementation used throughout this
 paper, including host setup, device memory allocation, and kernel dispatch, as
 well as the full MLIR intermediate representations at each lowering stage
 (linalg, affine, scf, and LLVM IR), are available in the accompanying

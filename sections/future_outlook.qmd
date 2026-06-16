@@ -3,8 +3,7 @@
 Several of the gaps identified in this paper are addressable in the near term.
 The performance gaps are implementation gaps rather than architectural ones. Fast-math support and the inconsistent atomic operation
 behavior on AMD are known missing features within MLIR's existing capabilities,
-not fundamental limitations of the approach
-[@godoyMojoMLIRBasedPerformancePortable2025]. As Mojo matures, MLIR's AOT and
+not fundamental limitations of the approach. As Mojo matures, MLIR's AOT and
 JIT paths offer opportunities to close these gaps in ways library-based
 approaches cannot easily replicate. Broader adoption also depends on factors
 beyond performance. Mojo is currently source-available but not open source, and

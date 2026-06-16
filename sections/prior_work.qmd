@@ -19,18 +19,18 @@ Julia    & Partial & Yes \\
 \end{center}
 ```
 
-## OpenCL [@stoneOpenCLParallelProgramming2010]
+## OpenCL
 
 OpenCL is an open framework for heterogeneous computing that provides a common API for executing parallel code across CPUs, GPUs, and accelerators from different vendors [@stoneOpenCLParallelProgramming2010]. By defining a shared device model and kernel interface, it allows the same code to run correctly on any conforming hardware, directly addressing vendor lock-in. However, correctness and performance are separate concerns, and achieving good results on a given target architecture still requires platform-specific tuning of memory layouts and work-group sizes. Because kernels are written in a C-based language managed through a verbose host API [@stoneOpenCLParallelProgramming2010], the gap between high-level code and low-level GPU kernels remains fully intact.
 
-## SYCL [@keryellKhronosSYCLOpenCL2015]
+## SYCL
 
 SYCL is a C++ programming model built on top of OpenCL that retains its cross-vendor portability while significantly improving developer ergonomics [@keryellKhronosSYCLOpenCL2015]. Through single-source programming, host and device code coexist in the same file using standard C++ constructs, removing the need for separate kernel strings and the verbose host API that OpenCL exposes. Because the language is still C++, the two-language problem remains unaddressed.
 
-## Kokkos [@trottKokkos3Programming2022]
+## Kokkos
 
 Kokkos is a C++ library for performance-portable parallel programming, designed to run efficiently across NVIDIA and AMD GPUs, multicore CPUs, and custom accelerators. Where OpenCL and SYCL address functional portability, Kokkos makes performance portability a first-class concern through its type-level abstractions. Kernels written once compile transparently to CUDA, HIP, or OpenMP depending on the target [@trottKokkos3Programming2022]. Because Kokkos is a C++ library, it shares the same limitation as the approaches above, leaving the two-language problem unaddressed.
 
-## Julia [@JuliaFreshApproach; @besardEffectiveExtensibleProgramming2019]
+## Julia
 
-Julia is a high-level, dynamically typed language for technical computing that addresses the two-language problem through JIT compilation, specializing code on runtime types to achieve near-native performance competitive with C and Fortran [@besardEffectiveExtensibleProgramming2019]. Its compiler internally lowers code through multiple IR levels, from a high-level Julia IR down to LLVM IR, an approach that resembles multi-level compilation but without standardized extensibility across hardware targets. GPU kernels can be expressed in the same language through packages such as CUDAnative.jl, removing the need to switch to a lower-level language entirely. This GPU support was built around NVIDIA's CUDA toolkit however, and support for other vendors exists as separate, independently maintained packages, leaving vendor portability considerably less resolved than in the C++ approaches above.
+Julia is a high-level, dynamically typed language for technical computing [@JuliaFreshApproach] that addresses the two-language problem through JIT compilation, specializing code on runtime types to achieve near-native performance competitive with C and Fortran [@besardEffectiveExtensibleProgramming2019]. Its compiler internally lowers code through multiple IR levels, from a high-level Julia IR down to LLVM IR, an approach that resembles multi-level compilation but without standardized extensibility across hardware targets. GPU kernels can be expressed in the same language through packages such as CUDAnative.jl, removing the need to switch to a lower-level language entirely. This GPU support was built around NVIDIA's CUDA toolkit however, and support for other vendors exists as separate, independently maintained packages, leaving vendor portability considerably less resolved than in the C++ approaches above.
