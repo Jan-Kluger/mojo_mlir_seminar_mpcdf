@@ -1,5 +1,5 @@
 ---
-title: "An MLIR-Based Approach to HPC Portability with Mojo"
+title: "An MLIR-Based Approach to HPC Portability"
 author:
   - name: Yannick Schürmann
     affiliation: Technical University of Munich
