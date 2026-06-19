@@ -10,9 +10,7 @@ learning curve and programming requirements remain fairly low-level
 [@godoyMojoMLIRBasedPerformancePortable2025]. Developers coming from Python who
 encounter Mojo's ownership model and compile-time constraints face a steeper
 transition than the language's surface syntax suggests
-[@akreComprehensiveReviewMojo2025].
-
-More fundamentally, because Python interoperability is runtime-only, a developer
+[@akreComprehensiveReviewMojo2025]. More fundamentally, because Python interoperability is runtime-only, a developer
 working in Mojo still maintains a boundary between the Python world and the
 compiled Mojo world. The split is narrowed but reproduced in a different form,
 rather than eliminated.
@@ -23,9 +21,7 @@ For memory-bound workloads the trade-off is favourable. As the benchmark results
 rewrites. For compute-bound
 workloads the case is weaker, with miniBUDE reaching only 54% of vendor
 performance on average, driven largely by the absence of fast-math support
-[@godoyMojoMLIRBasedPerformancePortable2025].
-
-Compared to Kokkos and SYCL, Mojo is less mature and currently lacks the
+[@godoyMojoMLIRBasedPerformancePortable2025]. Compared to Kokkos and SYCL, Mojo is less mature and currently lacks the
 high-level library coverage those approaches offer. The architectural difference
 is significant however. Mojo's portability is a compiler property rather than a
 library abstraction, meaning support for a new hardware target requires adding a
@@ -33,6 +29,15 @@ lowering dialect rather than rewriting user code. This is an advantage that may
 compound as the ecosystem matures, in a way that library-based portability
 cannot.
 
+Compilation time is a further trade-off. Mojo specializes kernels ahead of time,
+moving work that a just-in-time language like Julia defers to runtime into the
+build step instead, which brings it closer to the template-based C++ approaches
+that are themselves known for slow compilation. The MLIR foundation adds some
+overhead from its extensibility, but most of a Mojo program's compilation time is
+spent in the LLVM backend rather than in MLIR itself [@zotero-item-111]. The
+proxy kernels in the benchmark study compile in only a few seconds, and a
+systematic comparison with Julia and C++ remains open
+[@godoyMojoMLIRBasedPerformancePortable2025].
 
 ## Overall Assessment
 

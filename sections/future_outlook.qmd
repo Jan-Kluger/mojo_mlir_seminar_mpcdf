@@ -1,15 +1,16 @@
 # Future Outlook
 
-Several of the gaps identified in this paper are addressable in the near term.
-The performance gaps are implementation gaps rather than architectural ones. Fast-math support and the inconsistent atomic operation
+Several gaps identified in this paper are addressable in the near term, and the
+performance ones in particular are implementation issues rather than
+architectural ones. Fast-math support and the inconsistent atomic operation
 behavior on AMD are known missing features within MLIR's existing capabilities,
 not fundamental limitations of the approach. As Mojo matures, MLIR's AOT and
 JIT paths offer opportunities to close these gaps in ways library-based
 approaches cannot easily replicate. Broader adoption also depends on factors
 beyond performance. Mojo is currently source-available but not open source, and
 institutions building long-term HPC workflows are generally reluctant to commit
-to a closed language. Modular has indicated that Mojo will become open-source by
-2026 [@godoyMojoMLIRBasedPerformancePortable2025], which could significantly
+to a closed language. Modular has stated that Mojo will become open-source by
+fall 2026 [@godoyMojoMLIRBasedPerformancePortable2025], which could significantly
 lower the barrier to adoption in academic and national lab settings. The language
 is also still in active development, and the specification, standard library, and
 GPU backend remain subject to breaking changes. Features critical for large-scale
@@ -17,14 +18,8 @@ HPC such as multi-node support and portable high-level libraries are either
 absent or not yet mature.
 
 The MLIR foundation gives Mojo an architectural advantage that alternatives do not have.
-Adding support for a new hardware target reduces to writing a lowering dialect,
-which is cheaper than the library-level rewrites required by SYCL or Kokkos.
 Whether the ecosystem and governance can catch up to the technical promise is the
 open question. If they do, Mojo would be the first language to resolve both the
-two-language problem and vendor lock-in at the compiler level. There are already
-early signals of institutional interest. Researchers at Oak Ridge National
-Laboratory, home of the world's first exascale machine, have actively benchmarked
-Mojo on state-of-the-art hardware, with results already showing competitive
-performance for memory-bound workloads [@godoyMojoMLIRBasedPerformancePortable2025].
-The underlying infrastructure, MLIR, is battle-tested in production systems
-across the ML industry, giving Mojo a proven foundation to build on.
+two-language problem and vendor lock-in at the compiler level. The underlying
+infrastructure, MLIR, is already used in production ML systems and compilers
+across the industry, a solid foundation for Mojo to build on.

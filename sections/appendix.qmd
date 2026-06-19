@@ -5,3 +5,16 @@ paper, including host setup, device memory allocation, and kernel dispatch, as
 well as the full MLIR intermediate representations at each lowering stage
 (linalg, affine, scf, and LLVM IR), are available in the accompanying
 repository at \url{https://github.com/Jan-Kluger/mojo_mlir_seminar_mpcdf}.
+
+## Benchmark Charts
+
+The following figures show the per-kernel benchmark results summarised by the
+performance portability metric $\Phi$ in @fig-overall-perf.
+
+![Mojo vs CUDA and HIP performance for the seven-point stencil kernel on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/seven_point_perf.png){#fig-seven-point width=75%}
+
+![Mojo vs CUDA and HIP performance for BabelStream kernels on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/babel_stream_perf.png){#fig-babelstream width=75%}
+
+![Mojo vs CUDA and HIP performance for miniBUDE on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/miniBUDE_perf.png){#fig-minibude width=75%}
+
+![Mojo vs CUDA and HIP kernel execution times for Hartree-Fock on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/hartree_fock_perf_table.png){#fig-hartree width=65%}

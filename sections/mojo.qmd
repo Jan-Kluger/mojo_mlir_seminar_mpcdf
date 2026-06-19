@@ -56,27 +56,21 @@ property of the compiler rather than a dependency
 
 ## Shared Foundations
 
-Both resolutions are enabled by two shared language features. Static memory
-layout gives the compiler control over GPU access patterns. Compile-time
-specialization provides the information MLIR needs to optimise.
-
-### Static Memory Layout
+Both resolutions are enabled by two shared language features, static memory
+layout and compile-time specialization. 
 
 Struct defines value types with explicit memory layout, mapping directly to
 MLIR's type system. Unlike Python classes, which allow dynamic dispatch and
 runtime field binding, Mojo structs are fully static and resolved at compile
-time [@MojoManualMojo]. This static layout allows MLIR to reason about GPU
-memory access patterns and generate optimised loads without additional
-annotations from the programmer.
+time [@MojoManualMojo], allowing MLIR to reason about GPU memory access patterns
+and generate optimised loads without additional annotations from the programmer.
 
-### Compile-Time Specialization
-
-Mojo separates compile-time values, called parameters, from runtime values,
-called arguments. The compiler resolves parameters at compile
-time and generates a specialized version of the function for each unique set of
-parameter values [@MojoManualMojo]. This gives MLIR full visibility into problem
-shape at compile-time, enabling loop unrolling, register specialization, and
-memory access optimisation for a specific kernel configuration.
+Mojo also separates compile-time values, called parameters, from runtime values,
+called arguments. The compiler resolves parameters at compile time and generates
+a specialized version of the function for each unique set of parameter values
+[@MojoManualMojo], giving MLIR full visibility into problem shape and enabling
+loop unrolling, register specialization, and memory access optimisation for a
+specific kernel configuration.
 
 Most HPC applications follow a compile-once, run-many-times approach where
 performance-critical information such as problem sizes and memory layouts is
@@ -102,11 +96,8 @@ and `layout` are resolved by MLIR at compile-time, generating a specialised
 kernel for this exact problem shape.
 
 ::: {#fig-matmul-mojo}
-```mojo
-from std.gpu.host import DeviceContext
-from std.gpu  import block_dim, block_idx, 
-                                thread_idx
-from layout   import TileTensor, row_major
+```python
+...
 
 comptime dtype     = DType.float32
 comptime N         = 1024
@@ -139,22 +130,14 @@ Matrix multiplication from @fig-matrixmul-c in Mojo's GPU programming model.
 
 ## Benchmarking
 
-We do not run our own benchmarks. Instead we survey and summarise the
-performance results reported by Godoy et al.
-[@godoyMojoMLIRBasedPerformancePortable2025], whose evaluation compares Mojo
-against vendor baselines on an NVIDIA H100 and an AMD MI300A.
-
-To evaluate Mojo's GPU performance, Godoy et al. port four widely-used HPC
-proxy kernels to Mojo and compare them against CUDA on an NVIDIA H100 and HIP
-on an AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025]. The four kernels
-span two categories: two memory-bound (seven-point stencil and BabelStream) and
-two compute-bound (miniBUDE and Hartree-Fock). A kernel is *memory-bound* when
-its bottleneck is the rate at which data can be moved between memory and the
-processor, and should be optimised for memory throughput. A kernel is
-*compute-bound* when the bottleneck is the arithmetic itself, and should be
-optimised for floating-point throughput.
-
-Results are summarized using a performance portability metric $\Phi$, defined
+We do not run our own benchmarks. Instead we survey the results reported by
+Godoy et al., who port four widely-used HPC proxy kernels to Mojo and compare
+them against CUDA on an NVIDIA H100 and HIP on an AMD MI300A
+[@godoyMojoMLIRBasedPerformancePortable2025]. The four kernels span two
+categories: two memory-bound (seven-point stencil and BabelStream) and two
+compute-bound (miniBUDE and Hartree-Fock). A kernel is *memory-bound* when its
+bottleneck is the rate at which data can be moved between memory and the
+processor, and *compute-bound* when the bottleneck is the arithmetic itself. Results are summarized using a performance portability metric $\Phi$, defined
 as "the arithmetic mean of an application's performance efficiency observed
 across a set of platforms from the same architecture class"
 [@godoyMojoMLIRBasedPerformancePortable2025]
@@ -169,12 +152,10 @@ matches vendor performance across all platforms.
 
 Each kernel is measured using a metric suited to its nature. Memory-bound
 kernels are evaluated using effective memory bandwidth in GB/s, and
-compute-bound kernels using floating-point operations per second. Hartree-Fock,
-which approximates molecular electronic structure, is an exception. Its heavy
-use of atomic operations, where multiple threads compete to update the same
-memory locations simultaneously, creates contention that makes throughput
-metrics misleading, so raw kernel execution time in milliseconds is used
-instead. $\Phi$ is still computed for all four kernels.
+compute-bound kernels using floating-point operations per second. Hartree-Fock is
+an exception, as its heavy use of atomic operations creates contention that
+makes throughput metrics misleading, so raw kernel execution time in
+milliseconds is used instead. $\Phi$ is still computed for all four kernels.
 
 ### Memory-Bound Kernels
 
@@ -187,9 +168,6 @@ equivalent CUDA kernel (21), which reduces cache efficiency and accounts for the
 gap [@godoyMojoMLIRBasedPerformancePortable2025]. On the AMD MI300A, Mojo
 performs on par with HIP, with $\Phi$ = 0.92 across both platforms (@fig-seven-point).
 
-![Mojo vs CUDA and HIP performance for the seven-point stencil kernel on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/seven_point_perf.png){#fig-seven-point width=75% fig-pos="ht"}
-
-
 BabelStream measures the memory bandwidth limits of five standard array
 operations (Copy, Multiply, Add, Triad, and Dot). For the first four operations,
 Mojo slightly outperforms CUDA on the H100, a result attributed to MLIR
@@ -199,9 +177,6 @@ shared memory operations, reaches only 78% of CUDA performance because the
 portable Mojo implementation does not replicate NVIDIA-specific heuristics used
 in the CUDA version. Results on the MI300A are nearly indistinguishable from HIP
 across all operations, with $\Phi$ = 0.96 (@fig-babelstream).
-
-![Mojo vs CUDA and HIP performance for BabelStream kernels on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/babel_stream_perf.png){#fig-babelstream width=75% fig-pos="ht"}
-
 
 ### Compute-Bound Kernels
 
@@ -225,9 +200,6 @@ $$\Phi = \frac{0.82 + 0.59 + 0.38 + 0.38}{4} = 0.54$$
 which shows how a single $\Phi$ collapses strong NVIDIA results and weak AMD
 results into one number that reflects neither platform on its own.
 
-![Mojo vs CUDA and HIP performance for miniBUDE on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/miniBUDE_perf.png){#fig-minibude width=75% fig-pos="ht"}
-
-
 Hartree-Fock approximates the electronic structure of molecules by computing
 electron-repulsion integrals, a calculation that scales as $O(N^4)$ with the
 number of atoms. Parallelism is
@@ -245,15 +217,12 @@ $\Phi$ = 0.92 is misleading, as it averages out Mojo outperforming CUDA with
 Mojo underperforming HIP, obscuring the real picture
 [@godoyMojoMLIRBasedPerformancePortable2025] (@fig-hartree).
 
-![Mojo vs CUDA and HIP kernel execution times for Hartree-Fock on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/hartree_fock_perf_table.png){#fig-hartree width=65% fig-pos="ht"}
-
-
 ### Overall
 
 Mojo performs competitively with CUDA and HIP for memory-bound workloads,
 reaching near-parity on the MI300A and within a small margin on the H100.
 
-::: {#fig-overall-perf fig-align="center"}
+::: {#fig-overall-perf fig-align="center" fig-pos="H"}
 ![](images/overall_mojo_perf_table.png){width=55%}
 
 Performance portability metric $\Phi$ for all four kernels on the NVIDIA H100
@@ -268,7 +237,7 @@ shortfalls [@godoyMojoMLIRBasedPerformancePortable2025].
 
 ## Current Scope and Limitations
 
-Mojo is still pre-1.0 software: the latest tagged release at the time of writing
+Mojo is still pre-1.0 software. The latest tagged release at the time of writing
 is v1.0.0b1, a beta whose language and APIs may still change before the eventual
 1.0 release [@MojoReleasesMojo]. The examples in this paper target that version,
 and the limitations below should be read as a snapshot of a language still under
