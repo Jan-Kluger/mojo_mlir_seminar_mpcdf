@@ -41,15 +41,21 @@ systematic comparison with Julia and C++ remains open
 
 ## Overall Assessment
 
-Today, Julia handles the two-language split more effectively than Mojo, with a
+Returning to the comparison in Table \ref{tbl-prior-work}, the evidence
+surveyed here suggests that each existing approach still leads Mojo on its
+respective strength. Julia today handles the two-language split more
+effectively, with a
 mature ecosystem and JIT compilation that reaches near-native performance without
-requiring a clean break between high-level and performance-critical code. Kokkos
-and SYCL handle vendor portability more effectively, with battle-tested library
-support and the BLAS integration that serious HPC workloads depend on. Mojo
-currently lags behind both on their respective strengths, with a steep low-level
+requiring a clean break between high-level and performance-critical code
+[@besardEffectiveExtensibleProgramming2019]. Kokkos
+and SYCL handle vendor portability more effectively, with established library
+support and the BLAS integration that serious HPC workloads depend on
+[@trottKokkos3Programming2022]. Mojo
+currently lags behind both, with a steep low-level
 programming model, gaps in library coverage and compute-bound performance, and
 the practical limitations discussed above, including single-node execution,
-missing fast-math support, and incomplete tooling.
+missing fast-math support, and incomplete tooling
+[@godoyMojoMLIRBasedPerformancePortable2025].
 
 What Mojo offers that neither Julia nor Kokkos can is a single architectural
 foundation that structurally targets both problems at once. By being built

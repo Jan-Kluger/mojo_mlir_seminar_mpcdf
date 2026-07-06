@@ -32,10 +32,16 @@ header-includes:
   - \usepackage{titlesec}
   - \titlespacing*{\subsubsection}{0pt}{1.0em}{0.0em}
   - \usepackage{etoolbox}
-  - \BeforeBeginEnvironment{Shaded}{\vspace{-4pt}}
-  - \AfterEndEnvironment{Shaded}{\vspace{-4pt}}
+  - \usepackage[most]{tcolorbox}
+  - \definecolor{codebg}{RGB}{247,248,250}
+  - \definecolor{codeframe}{RGB}{206,212,218}
+  - \renewenvironment{Shaded}{\begin{tcolorbox}[breakable,enhanced,arc=2pt,colback=codebg,colframe=codeframe,boxrule=0.5pt,left=6pt,right=6pt,top=4pt,bottom=4pt,boxsep=0pt,before skip=4pt,after skip=4pt]}{\end{tcolorbox}}
+  - \AtBeginDocument{\floatstyle{plain}\restylefloat{codelisting}}
+  - \captionsetup[codelisting]{skip=4pt}
   - \raggedbottom
 ---
+# AI statment
+While writing this paper Claude Opus 4.8 and Sonnet 4.8 were occasionally used for grammar, wording and for debugging/adapting Mojo code.
 
 {{< include sections/introduction.qmd >}}
 

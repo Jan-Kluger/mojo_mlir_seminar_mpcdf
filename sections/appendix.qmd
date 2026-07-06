@@ -11,10 +11,10 @@ repository at \url{https://github.com/Jan-Kluger/mojo_mlir_seminar_mpcdf}.
 The following figures show the per-kernel benchmark results summarised by the
 performance portability metric $\Phi$ in @fig-overall-perf.
 
-![Mojo vs CUDA and HIP performance for the seven-point stencil kernel on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/seven_point_perf.png){#fig-seven-point width=75%}
+![Measured bandwidth for the seven-point stencil across grid and block configurations in single and double precision. Each point is one benchmark run, comparing Mojo with CUDA on the NVIDIA H100 (top) and with HIP on the AMD MI300A (bottom) [@godoyMojoMLIRBasedPerformancePortable2025].](images/seven_point_perf.png){#fig-seven-point width=75%}
 
-![Mojo vs CUDA and HIP performance for BabelStream kernels on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/babel_stream_perf.png){#fig-babelstream width=75%}
+![Measured bandwidth for the five BabelStream operations. Each point is one benchmark run, comparing Mojo with CUDA on the H100 (top) and with HIP on the MI300A (bottom) [@godoyMojoMLIRBasedPerformancePortable2025].](images/babel_stream_perf.png){#fig-babelstream width=75%}
 
-![Mojo vs CUDA and HIP performance for miniBUDE on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/miniBUDE_perf.png){#fig-minibude width=75%}
+![miniBUDE throughput in GFLOP/s over poses per work item (PPWI) for work-group sizes 8 and 64 on the H100, comparing Mojo against CUDA with and without fast-math [@godoyMojoMLIRBasedPerformancePortable2025].](images/miniBUDE_perf.png){#fig-minibude width=75%}
 
-![Mojo vs CUDA and HIP kernel execution times for Hartree-Fock on the NVIDIA H100 and AMD MI300A [@godoyMojoMLIRBasedPerformancePortable2025].](images/hartree_fock_perf_table.png){#fig-hartree width=65%}
+![Hartree-Fock kernel execution times in milliseconds per problem size. The missing entry is the 1024-atom case on the MI300A that produced no result [@godoyMojoMLIRBasedPerformancePortable2025].](images/hartree_fock_perf_table.png){#fig-hartree width=65%}
